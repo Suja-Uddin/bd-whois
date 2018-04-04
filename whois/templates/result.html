@@ -1,0 +1,128 @@
+
+<html>
+<head>   {% load staticfiles %} {% load bootstrap3 %}
+ 
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{% static "bootstrap.min.css" %}">
+  <script src="{% static "jquery.min.js" %}"></script>
+  <script src="{% static "bootstrap.min.js" %}"></script>
+
+  <meta charset="utf-8">
+
+   <link rel="stylesheet" href="{% static "jquery-ui.css" %}">
+  <script src="{% static "jquery-ui.js" %}"></script>
+  <script src="{% static "jquery-1.10.2.js" %}"></script>
+
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+	<div class="container-fluid">
+		<div class="navbar-header">
+      		<a class="navbar-brand" href="{%url 'whois:index'%}"><font color='GreenYellow'>Whois</font></a>
+    	</div>
+	</div>
+</nav>
+<div class="page-header text-center" >
+  <h3>Search for your desired domain</h3>    
+  {%if error%}  
+  <div class="alert alert-danger">
+   Enter valid domain!
+	</div>
+{%endif%}
+</div>
+<div class='row'>
+	<div class='col-md-2'></div>
+	<div class='col-md-8'>
+		<div class='well'>
+			<div class='row'>
+				<div class='col-md-2'></div>
+				<div class='col-md-6'>
+					<form role='form' method='post' action="{%url 'whois:show_result'%}">
+						<div class='form-group'>
+						 {% csrf_token %}
+						<input type='text' placeholder="enter domain name without www and .bd" name='domain_name' class='form-control' id='search_domain'>
+						</div>
+					
+				</div>
+				<div class='col-md-4'><input type='submit' value='search' class='btn btn-success'> </div>
+			</div>
+			</form>
+		</div>
+	</div>
+	<div class='col-md-2'></div>
+</div>
+
+{%if available%}
+  <div class="alert alert-success">
+   Domain is available!!
+	</div>
+
+{%else%}
+  <div class="alert alert-danger">
+   Domain is not available!!
+	</div>
+
+	<table  class='table table-hover'>
+	<tr>
+		<td>Domain name</td>
+		<td>{{info.0}}</td>
+	</tr>
+	<tr>
+		<td>Registrant Name</td>
+		<td>{{info.1}}</td>
+	</tr>
+	<tr>
+		<td>Contact Email</td>
+		<td>{{info.2}}</td>
+	</tr>
+	<tr>
+		<td>Due Date</td>
+		<td>{{info.3}}</td>
+	</tr>
+</table>
+{%endif%}
+
+
+
+</body>
+
+<script >
+
+ $(document).ready(function() {
+ 	jQuery.noConflict(); 
+ 	var tags=[];
+ 	$( "#search_domain" ).autocomplete({
+        source: function( request, response ) {
+                var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+                response( $.grep( tags, function(item){
+                    return matcher.test( item );
+                }) );
+            }
+      });
+
+ 	$("#search_domain").keyup(function(){
+ 		var e=this.value;
+ 		var i=0;
+ 		tags=[];
+ 		var x='';
+ 		for(i=0;i<e.length;i++)
+ 		{
+ 			if (e[i]=='.')
+ 			{
+ 				{%for ii in extension%}
+ 					tags.push(x+"."+"{{ii}}");
+ 				{%endfor%}
+ 				break;
+ 			}
+ 			x+=e[i];
+ 		}
+ 	});
+
+ });
+
+</script>
+
+</html>
+
+
